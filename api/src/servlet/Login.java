@@ -456,6 +456,7 @@ public class Login extends HttpServlet {
 				DaoUsers.updateUsername(DaoUsers.STABLE_NAME,Integer.parseInt(id),newData);
 				DaoMicroBlog.updataUsername(DaoMicroBlog.STABLE_NAME,Integer.parseInt(id),newData);
 
+
 				outputStream.write("ÐÞ¸Ä³É¹¦".getBytes("utf-8"));
 				break;
 				
