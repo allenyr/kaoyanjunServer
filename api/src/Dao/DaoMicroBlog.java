@@ -19,7 +19,7 @@ public class DaoMicroBlog {
 	
 	public static final String STABLE_NAME = "microblog";
 	private static final int REFRESH_LENGTH = 10;
-	private static final int UPLOAD_LENGTH = 5;
+	private static final int UPLOAD_LENGTH = 10;
 	
 	//创建一个JDBC连接
 	private static Connection getConn() {

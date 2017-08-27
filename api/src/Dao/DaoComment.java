@@ -1,5 +1,6 @@
 package Dao;
 
+import Model.NewsBean;
 import globle.Constant;
 
 import java.sql.DriverManager;
@@ -15,6 +16,9 @@ import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.PreparedStatement;
 
 public class DaoComment {
+
+	private static final int REFRESH_LENGTH = 10;
+	private static final int UPLOAD_LENGTH = 10;
 	
 	//创建一个JDBC连接
 	private static Connection getConn() {
@@ -79,8 +83,7 @@ public class DaoComment {
 	}
 	
 	//加载评论
-	public static List<Comment> getSQLDataToList(String id) {
-		String sql = "select * from comment"+ id +" ORDER BY id";
+	public static List<Comment> getSQLDataToList(String sql) {
 		List<Comment> commentList = new ArrayList<Comment>();
 	    Connection conn = getConn();
 	    PreparedStatement pstmt = null;
@@ -126,7 +129,19 @@ public class DaoComment {
 	        e.printStackTrace();
 	    }
 	    return commentList;
-	}	
-	
+	}
+
+
+	//刷新指定position最新信息
+	public static List<Comment> getComment(String id) {
+		String sql = "select * from comment"+ id +" limit " + 0 + "," +REFRESH_LENGTH;
+		return getSQLDataToList(sql);
+	}
+
+	//加载指定position最新信息
+	public static List<Comment> getMoreComment(String id, String position) {
+		String sql = "select * from comment"+ id +" limit " + position + "," +UPLOAD_LENGTH;
+		return getSQLDataToList(sql);
+	}
 	
 }

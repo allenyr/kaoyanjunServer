@@ -68,7 +68,9 @@ public class Login extends HttpServlet {
 	//数据返回变量
 //	private JSONArray json;
 	private OutputStream outputStream;
-	
+
+	private String mPosition;
+
 	private static final int TEST = 0;
 	private static final int WHAT_LOGIN = 1;
 	private static final int WHAT_ASSIGN = 2;
@@ -129,9 +131,12 @@ public class Login extends HttpServlet {
 	private static final int WHAT_GET_BANNER = 57;
 	private static final int WHAT_GET_NEWS = 58;
 	private static final int WHAT_SET_NEW_SEE = 59;
-	
+	private static final int WHAT_GET_MORE_NEW = 60;
+	private static final int WHAT_GET_MORE_COMMENT = 61;
+
+	private List<NewsBean> newsBeanList = new ArrayList<NewsBean>();
 	private List<MicroBlog> microBlogList = new ArrayList<MicroBlog>();
-	private List<Infom> filelist = new ArrayList<Infom>(); 
+	private List<Infom> filelist = new ArrayList<Infom>();
 	private List<Message> messagesList = new ArrayList<Message>(); 
 	private List<UserInfoDataBean> userList = new ArrayList<UserInfoDataBean>(); 
 	private List<Question> questionList = new ArrayList<Question>(); 
@@ -843,6 +848,21 @@ public class Login extends HttpServlet {
 				id = request.getParameter("param1");
 				DbNews.updateSee(DbNews.STABLE_NAME_NEWS, Integer.parseInt(id));
 				break;
+
+			//加载最新列表
+			case WHAT_GET_MORE_NEW:
+				temp = request.getParameter("param1");
+				listviewSize= Integer.parseInt(temp); //string转int
+				newsBeanList = DbNews.getMoreNews(DbNews.STABLE_NAME_NEWS,listviewSize);
+				mJsonString = JsonUtils.toJson(newsBeanList);
+				System.out.println(mJsonString);
+				outputStream.write(mJsonString.getBytes("utf-8"));
+				break;
+			case WHAT_GET_MORE_COMMENT:
+				id = request.getParameter("param1");
+				mPosition = request.getParameter("param2");
+				getMoreComment(id,mPosition);
+				break;
 		}
 		
 	}
@@ -889,10 +909,10 @@ public class Login extends HttpServlet {
 	//获取评论
 	private void  getComment(String position) {
 		DaoComment.creatCommentTable(position);
-		commentList = DaoComment.getSQLDataToList(position);
+		commentList = DaoComment.getComment(position);
 		mJsonString = JsonUtils.toJson(commentList);
-//		json = JSONArray.fromObject(commentList); 
-		System.out.println(mJsonString); 
+//		json = JSONArray.fromObject(commentList);
+		System.out.println(mJsonString);
 		try {
 			outputStream.write(mJsonString.getBytes("utf-8"));
 		} catch (UnsupportedEncodingException e) {
@@ -903,6 +923,25 @@ public class Login extends HttpServlet {
 			e.printStackTrace();
 		}
 	}
+
+	//获取评论
+	private void  getMoreComment(String id,String position) {
+		DaoComment.creatCommentTable(id);
+		commentList = DaoComment.getMoreComment(id,position);
+		mJsonString = JsonUtils.toJson(commentList);
+//		json = JSONArray.fromObject(commentList);
+		System.out.println(mJsonString);
+		try {
+			outputStream.write(mJsonString.getBytes("utf-8"));
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	//获取回复
 	private void  getReply(String position) {
 		DaoReply.creatReplyTable(position);

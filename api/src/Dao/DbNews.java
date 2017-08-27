@@ -1,5 +1,6 @@
 package Dao;
 
+import Model.MicroBlog;
 import globle.Constant;
 
 import java.sql.DriverManager;
@@ -18,6 +19,9 @@ import com.mysql.jdbc.PreparedStatement;
 public class DbNews {
 	public static final String STABLE_NAME_BANNER = "banner";
 	public static final String STABLE_NAME_NEWS = "news";
+	private static final int REFRESH_LENGTH = 10;
+	private static final int UPLOAD_LENGTH = 10;
+
 	//创建一个JDBC连接
 	private static Connection getConn() {
 	    Connection conn = null;
@@ -49,19 +53,16 @@ public class DbNews {
 	}
 	
 	//返回news
-	public static List<NewsBean> getNews(String table) {
+	public static List<NewsBean> getSQLDataToList(String sql) {
 		int k=0;
 		List<NewsBean> lNewsBeans = new ArrayList<NewsBean>();
 	    Connection conn = getConn();
-	    String sql = "select * from "+ table +" ORDER BY id DESC";
 	    PreparedStatement pstmt;
 	    try {
 	    	pstmt = (PreparedStatement)conn.prepareStatement(sql);
 	        ResultSet rs = pstmt.executeQuery();			//行元素
 	        int col = rs.getMetaData().getColumnCount();	//列元素
-	        System.out.println("col="+col);
 	        while (rs.next()) {
-	        	System.out.println("k="+(k++));
 	        	NewsBean bean = new NewsBean();
 	        	for (int i = 1; i <= col; i++) {
 	                String data = rs.getString(i);
@@ -99,6 +100,18 @@ public class DbNews {
 	        e.printStackTrace();
 	    }
 	    return lNewsBeans;
+	}
+
+	//刷新指定position最新信息
+	public static List<NewsBean> getNews(String table) {
+		String sql = "select * from "+ table + " ORDER BY id DESC limit " + 0 + "," +REFRESH_LENGTH;;
+		return getSQLDataToList(sql);
+	}
+
+	//加载指定position最新信息
+	public static List<NewsBean> getMoreNews(String table, int position) {
+		String sql = "select * from "+ table + " ORDER BY id DESC limit " + position + "," +UPLOAD_LENGTH;
+		return getSQLDataToList(sql);
 	}
 	
 	//增加点赞
